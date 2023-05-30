@@ -3,6 +3,7 @@ package com.kylesboot.helloboot;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -24,21 +25,22 @@ public class HellobootApplication {
         TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory(); // Embeded 톰캣 서브릿 웹서버를 호출한.
         // 만약 다른 서브렛 컨테이너 를 사용하고 싶다면 JettyServletWebServerFactory()
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            HelloController helloController = new HelloController();
-
             servletContext.addServlet("frontcontroller", new HttpServlet() { // 서브랫 추가해주기
                 @Override
                 protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    // 인증, 보안, 다국어, 공통기능
+                    // Spring Container를 생성해 보자. GenericApplicationContext가 결정적으로 사용된다.
+                    GenericApplicationContext applicationContext = new GenericApplicationContext();
+                    applicationContext.registerBean(HelloController.class);
+                    applicationContext.refresh(); // 구성정보를 다시 초기화 해준다.
 
                     // hello와 GET요청을 서브랫과 매핑
                     if(req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) { // hello page와 Get요청일때만
 
                         String name = req.getParameter("name"); // 매핑
+                        HelloController helloController = applicationContext.getBean(HelloController.class);
                         String printValue = helloController.hello(name);// 비즈니스 로직 바인딩
-
                         resp.setStatus(HttpStatus.OK.value()); // set status
-                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE); // set header
+                        resp.setContentType( MediaType.TEXT_PLAIN_VALUE); // set header보다 간단하다.
                         resp.getWriter().print(printValue); // set Body
                     } else if(req.getRequestURI().equals("/user")){ // user page
                         //
