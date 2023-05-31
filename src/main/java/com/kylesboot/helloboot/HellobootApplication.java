@@ -33,7 +33,7 @@ public class HellobootApplication {
         // 만약 다른 서브렛 컨테이너 를 사용하고 싶다면 JettyServletWebServerFactory()
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
             servletContext.addServlet("dispatcherServlet",
-                new DispatcherServlet(applicationContext)
+                new DispatcherServlet(applicationContext) // applicationContext받아서 dispatcherServlet은 빈을 다 뒤져서 요청을 처리할 수 있게 맵핑해준다.
                     ).addMapping("/*"); //프론트 컨트롤러는 모든 요청을 받아 드린다
         });
         webServer.start();
