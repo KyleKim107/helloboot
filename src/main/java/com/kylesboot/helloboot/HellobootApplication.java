@@ -31,6 +31,7 @@ public class HellobootApplication {
                     // Spring Container를 생성해 보자. GenericApplicationContext가 결정적으로 사용된다.
                     GenericApplicationContext applicationContext = new GenericApplicationContext();
                     applicationContext.registerBean(HelloController.class);
+                    applicationContext.registerBean(SimpleHelloService.class);
                     applicationContext.refresh(); // 구성정보를 다시 초기화 해준다.
 
                     // hello와 GET요청을 서브랫과 매핑
